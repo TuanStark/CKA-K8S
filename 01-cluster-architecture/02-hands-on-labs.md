@@ -159,8 +159,12 @@ etcdutl snapshot status /opt/cka-etcd-backup.db -w table
 k delete pod before-backup $now
 k run after-backup --image=nginx:1.27
 
-# 4. Restore snapshot sang thư mục mới
-etcdutl snapshot restore /opt/cka-etcd-backup.db --data-dir=/var/lib/etcd-from-backup
+# 4. Restore snapshot sang thư mục mới (Những gi trị này có trong cat /etc/kubernetes/manifests/etcd.yaml)
+etcdutl snapshot restore /opt/cka-etcd-backup.db \
+  --name=controlplane \
+  --initial-cluster=controlplane=https://172.30.1.2:2380 \
+  --initial-advertise-peer-urls=https://172.30.1.2:2380 \
+  --data-dir=/var/lib/etcd-from-backup
 
 # Sao lưu manifest và đổi hostPath của volume etcd-data
 cp /etc/kubernetes/manifests/etcd.yaml /tmp/etcd.yaml.bak
